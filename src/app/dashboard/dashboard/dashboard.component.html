@@ -1,16 +1,16 @@
-<div class="grid w-full grid-cols-1 lg:grid-cols-3 gap-6">
-  <!-- Main Section (Market Overview) -->
-  <section class="lg:col-span-2">
-    <div class="bg-white p-4 rounded shadow">
-      <!-- Header: Title + Filters -->
+<div class="grid w-full grid-cols-1 lg:grid-cols-3 gap-6 ">
+
+  <section class="lg:col-span-2 border rounded-lg">
+    <div class="p-4 rounded shadow">
+    
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-4">
-        <!-- Title & Subtext -->
-        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 ">
           <h2 class="text-xl font-semibold">Market Overview</h2>
           <div class="text-sm text-slate-500">Top {{ perPage }} by market cap</div>
         </div>
 
-        <!-- Search & Per Page Selector -->
+       
         <div class="flex flex-col sm:flex-row items-stretch gap-2">
           <input [(ngModel)]="query" (ngModelChange)="onQueryChange($event)"
                  class="border rounded px-3 py-1 text-sm w-full sm:w-auto"
@@ -24,11 +24,11 @@
         </div>
       </div>
 
-      <!-- Loading / Error States -->
+     
       <div *ngIf="loading" class="p-8 text-center text-slate-500">Loading market data...</div>
       <div *ngIf="error" class="p-4 text-red-600">{{error}}</div>
 
-      <!-- Responsive Table Wrapper -->
+     
       <div class="overflow-x-auto">
         <table *ngIf="coins?.length" class="min-w-full text-sm">
           <thead class="text-slate-500 text-left">
@@ -68,7 +68,8 @@
         </table>
       </div>
 
-      <!-- Pagination -->
+    
+
       <div class="flex flex-col sm:flex-row items-center justify-between mt-4 gap-3">
         <div class="text-sm text-slate-500">Page {{page}}</div>
         <div class="flex gap-2">
@@ -80,16 +81,16 @@
     </div>
   </section>
 
-  <!-- Sidebar -->
+  
   <aside class="flex flex-col gap-4">
-    <!-- Quick Stats -->
-    <div class="bg-white p-4 rounded shadow">
+   
+    <div class="bg-white p-4 rounded shadow border">
       <h3 class="font-semibold mb-2">Quick stats</h3>
       <div class="text-sm text-slate-500">Showing top coins. Click coin for details and chart.</div>
     </div>
 
-    <!-- Favorites -->
-    <div class="bg-white p-4 rounded shadow">
+   
+    <div class="bg-white p-4 rounded shadow border">
       <h3 class="font-semibold mb-3">Favorites</h3>
       <div *ngIf="favorites?.length === 0" class="text-sm text-slate-500">
         No favorites yet. Click Fav on any coin.

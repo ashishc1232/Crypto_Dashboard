@@ -57,7 +57,7 @@ export class DashboardComponent implements OnInit {
         res = await firstValueFrom(this.api.getMarkets('usd', this.page, this.perPage, undefined));
         this.cache.set(cacheKey, res);
       }
-      // apply client-side search if query provided
+      
       if (this.query?.trim()) {
         const q = this.query.toLowerCase();
         this.coins = res.filter(c => c.name.toLowerCase().includes(q) || c.symbol.toLowerCase().includes(q));

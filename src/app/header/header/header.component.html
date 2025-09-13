@@ -1,0 +1,83 @@
+<header class="bg-white/80 backdrop-blur-md shadow-lg rounded-lg border-b border-gray-100 sticky top-0 z-50 w-full">
+  <div class="container mx-auto ">
+    <div class="flex items-center justify-between h-16 lg:h-20">
+
+
+      <a routerLink="/" class="flex items-center space-x-3 group transition-transform hover:scale-105">
+        <div class="relative">
+          <div
+            class="rounded-xl  text-white font-bold text-lg  group-hover:shadow-xl transition-all duration-300">
+            <img src="logo_tran.png" alt="" height="100" width="100"  md:height="90" md:width="90" class="rounded-2xl">
+          </div>
+          
+        </div>
+        <div class="hidden sm:block">
+          <div class="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+            Crypto Dashboard
+          </div>
+          <div class="text-sm text-gray-500 font-medium">
+            Realtime market overview
+          </div>
+        </div>
+      </a>
+
+
+      <nav class="hidden md:flex items-center space-x-8">
+        <a routerLink="/" routerLinkActive="text-indigo-600 border-indigo-600"
+          class="text-sm font-medium text-gray-700 hover:text-indigo-600 border-b-2 border-transparent hover:border-indigo-300 pb-1 transition-all duration-200">
+          Market
+        </a>
+        <a routerLink="/favorites" routerLinkActive="text-indigo-600 border-indigo-600"
+          class="text-sm font-medium text-gray-700 hover:text-indigo-600 border-b-2 border-transparent hover:border-indigo-300 pb-1 transition-all duration-200">
+          Favorites
+        </a>
+        <a href="https://www.coingecko.com" target="_blank" rel="noreferrer"
+          class="text-sm font-medium text-gray-500 hover:text-gray-700 flex items-center space-x-1 transition-colors">
+          <span>Source</span>
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 
+                 0v6m0-6L10 14"></path>
+          </svg>
+        </a>
+      </nav>
+
+
+      <button class="md:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+        (click)="toggleMobileMenu()" [attr.aria-expanded]="isMobileMenuOpen" aria-label="Toggle navigation menu">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path *ngIf="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"></path>
+          <path *ngIf="isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+
+    <div class="md:hidden" [class.hidden]="!isMobileMenuOpen">
+      <div class="px-2 pt-2 pb-3 space-y-1 bg-white/95 backdrop-blur-sm border-t border-gray-100 shadow-lg">
+        <a routerLink="/" routerLinkActive="bg-indigo-50 text-indigo-600 border-indigo-600"
+          class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 transition-colors"
+          (click)="closeMobileMenu()">
+          Market
+        </a>
+        <a routerLink="/favorites" routerLinkActive="bg-indigo-50 text-indigo-600 border-indigo-600"
+          class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 transition-colors"
+          (click)="closeMobileMenu()">
+          Favorites
+        </a>
+        <a href="https://www.coingecko.com" target="_blank" rel="noreferrer"
+          class="block px-3 py-2 rounded-md text-base font-medium text-gray-500 hover:text-gray-700 transition-colors">
+          <span class="flex items-center space-x-2">
+            <span>Source</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 
+                   002 2h10a2 2 0 002-2v-4M14 4h6m0 
+                   0v6m0-6L10 14"></path>
+            </svg>
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>

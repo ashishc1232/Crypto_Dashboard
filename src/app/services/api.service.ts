@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { firstValueFrom, map } from 'rxjs';
+import { catchError, firstValueFrom, map, of } from 'rxjs';
 
 const BASE = 'https://api.coingecko.com/api/v3';
 
@@ -24,14 +24,32 @@ export class ApiService {
 
  
   getCoinDetail(id: string) {
-    return this.http.get<any>(`${BASE}/coins/${id}`, {
-      params: new HttpParams().set('localization', 'false').set('tickers', 'false').set('market_data', 'true').set('community_data','false').set('developer_data','false').set('sparkline','false')
-    });
-  }
+  return this.http.get<any>(`${BASE}/coins/${id}`, {
+    params: new HttpParams()
+      .set('localization', 'false')
+      .set('tickers', 'false')
+      .set('market_data', 'true')
+      .set('community_data','false')
+      .set('developer_data','false')
+      .set('sparkline','false')
+  }).pipe(
+    catchError(err => {
+      console.error('Coin detail API error:', err);
+      return of(null); // return empty so UI still works
+    })
+  );
+}
 
   getCoinMarketChart(id: string, vs_currency = 'usd', days = 30) {
-    return this.http.get<any>(`${BASE}/coins/${id}/market_chart`, {
-      params: new HttpParams().set('vs_currency', vs_currency).set('days', String(days))
-    });
-  }
+  return this.http.get<any>(`${BASE}/coins/${id}/market_chart`, {
+    params: new HttpParams()
+      .set('vs_currency', vs_currency)
+      .set('days', String(days))
+  }).pipe(
+    catchError(err => {
+      console.error('Market chart API error:', err);
+      return of({ prices: [] }); // safe fallback
+    })
+  );
+}
 }

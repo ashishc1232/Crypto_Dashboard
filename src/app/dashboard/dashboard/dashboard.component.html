@@ -1,22 +1,30 @@
 <div class="grid w-full grid-cols-1 lg:grid-cols-3 gap-6 ">
-
+  <!-- Market Overview -->
   <section class="lg:col-span-2 border rounded-lg">
     <div class="p-4 rounded shadow">
-    
-      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-4">
-        
+      <!-- Header -->
+      <div
+        class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-4"
+      >
         <div class="flex flex-col sm:flex-row sm:items-center gap-2 ">
           <h2 class="text-xl font-semibold">Market Overview</h2>
-          <div class="text-sm text-slate-500">Top {{ perPage }} by market cap</div>
+          <div class="text-sm text-slate-500">
+            Top {{ perPage }} by market cap
+          </div>
         </div>
 
-       
         <div class="flex flex-col sm:flex-row items-stretch gap-2">
-          <input [(ngModel)]="query" (ngModelChange)="onQueryChange($event)"
-                 class="border rounded px-3 py-1 text-sm w-full sm:w-auto"
-                 placeholder="Search coin (e.g. bitcoin)" />
-          <select [(ngModel)]="perPage"
-                  class="border rounded px-2 py-1 text-sm w-full sm:w-auto">
+          <input
+            [(ngModel)]="query"
+            (ngModelChange)="onQueryChange($event)"
+            class="border rounded px-3 py-1 text-sm w-full sm:w-auto"
+            placeholder="Search coin (e.g. bitcoin)"
+          />
+          <select
+            [(ngModel)]="perPage"
+            (change)="load()"
+            class="border rounded px-2 py-1 text-sm w-full sm:w-auto"
+          >
             <option [value]="10">10</option>
             <option [value]="25">25</option>
             <option [value]="50">50</option>
@@ -24,11 +32,19 @@
         </div>
       </div>
 
-     
-      <div *ngIf="loading" class="p-8 text-center text-slate-500">Loading market data...</div>
-      <div *ngIf="error" class="p-4 text-red-600">{{error}}</div>
+      <!-- States -->
+      <div *ngIf="loading" class="p-8 text-center text-slate-500">
+        Loading market data...
+      </div>
+      <div *ngIf="error" class="p-4 text-red-600">{{ error }}</div>
+      <div
+        *ngIf="!loading && !error && !coins?.length"
+        class="p-4 text-slate-500"
+      >
+        No coins available. Try refreshing.
+      </div>
 
-     
+      <!-- Table -->
       <div class="overflow-x-auto">
         <table *ngIf="coins?.length" class="min-w-full text-sm">
           <thead class="text-slate-500 text-left">
@@ -42,24 +58,50 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let c of coins; index as i" class="border-t">
-              <td class="py-3">{{(page-1)*perPage + i + 1}}</td>
+            <tr
+              *ngFor="let c of coins; index as i"
+              class="border-t hover:bg-slate-50"
+            >
+              <td class="py-3">{{ (page - 1) * perPage + i + 1 }}</td>
               <td>
-                <a [routerLink]="['/coin', c.id]" class="flex items-center gap-3 hover:underline">
-                  <img [src]="c.image" alt="{{c.name}}" width="28" height="28" class="rounded" />
+                <a
+                  [routerLink]="['/coin', c.id]"
+                  class="flex items-center gap-3 hover:underline"
+                >
+                  <img
+                    [src]="c.image"
+                    alt="{{ c.name }}"
+                    width="28"
+                    height="28"
+                    class="rounded"
+                  />
                   <div>
-                    <div class="font-semibold">{{c.name}}</div>
-                    <div class="text-xs text-slate-500">{{c.symbol | uppercase}}</div>
+                    <div class="font-semibold">{{ c.name }}</div>
+                    <div class="text-xs text-slate-500">
+                      {{ c.symbol | uppercase }}
+                    </div>
                   </div>
                 </a>
               </td>
-              <td class="text-right font-mono">${{c.current_price | number:'1.2-2'}}</td>
-              <td class="text-right" [ngClass]="c.price_change_percentage_24h >= 0 ? 'text-emerald-600' : 'text-rose-600'">
-                {{c.price_change_percentage_24h | number:'1.2-2'}}%
+              <td class="text-right font-mono">
+                ${{ c.current_price | number : '1.2-2' }}
               </td>
-              <td class="text-right">${{c.market_cap | number}}</td>
+              <td
+                class="text-right"
+                [ngClass]="
+                  c.price_change_percentage_24h >= 0
+                    ? 'text-emerald-600'
+                    : 'text-rose-600'
+                "
+              >
+                {{ c.price_change_percentage_24h | number : '1.2-2' }}%
+              </td>
+              <td class="text-right">${{ c.market_cap | number }}</td>
               <td class="text-right">
-                <button (click)="toggleFav(c.id)" class="px-2 py-1 rounded border text-sm">
+                <button
+                  (click)="toggleFav(c.id)"
+                  class="px-2 py-1 rounded border text-sm"
+                >
                   {{ favSvc.isFav(c.id) ? 'Unfav' : 'Fav' }}
                 </button>
               </td>
@@ -68,40 +110,64 @@
         </table>
       </div>
 
-    
-
-      <div class="flex flex-col sm:flex-row items-center justify-between mt-4 gap-3">
-        <div class="text-sm text-slate-500">Page {{page}}</div>
+      <!-- Pagination -->
+      <div
+        class="flex flex-col sm:flex-row items-center justify-between mt-4 gap-3"
+      >
+        <div class="text-sm text-slate-500">Page {{ page }}</div>
         <div class="flex gap-2">
-          <button (click)="prev()" class="px-3 py-1 border rounded" [disabled]="page<=1">Prev</button>
-          <button (click)="next()" class="px-3 py-1 border rounded">Next</button>
-          <button (click)="refresh()" class="px-3 py-1 border rounded">Refresh</button>
+          <button
+            (click)="prev()"
+            class="px-3 py-1 border rounded"
+            [disabled]="page <= 1"
+          >
+            Prev
+          </button>
+          <button (click)="next()" class="px-3 py-1 border rounded">
+            Next
+          </button>
+          <button (click)="refresh()" class="px-3 py-1 border rounded">
+            Refresh
+          </button>
         </div>
       </div>
     </div>
   </section>
 
-  
+  <!-- Sidebar -->
   <aside class="flex flex-col gap-4">
-   
     <div class="bg-white p-4 rounded shadow border">
       <h3 class="font-semibold mb-2">Quick stats</h3>
-      <div class="text-sm text-slate-500">Showing top coins. Click coin for details and chart.</div>
+      <div class="text-sm text-slate-500">
+        Showing top coins. Click coin for details and chart.
+      </div>
     </div>
 
-   
     <div class="bg-white p-4 rounded shadow border">
       <h3 class="font-semibold mb-3">Favorites</h3>
       <div *ngIf="favorites?.length === 0" class="text-sm text-slate-500">
         No favorites yet. Click Fav on any coin.
       </div>
       <ul *ngIf="favorites?.length">
-        <li *ngFor="let f of favCoins" class="flex items-center justify-between py-2 border-b">
+        <li
+          *ngFor="let f of favCoins"
+          class="flex items-center justify-between py-2 border-b"
+        >
           <div class="flex items-center gap-3">
-            <img [src]="f.image" alt="{{f.name}}" width="28" height="28" class="rounded" />
-            <a [routerLink]="['/coin', f.id]" class="hover:underline">{{f.name}}</a>
+            <img
+              [src]="f.image"
+              alt="{{ f.name }}"
+              width="28"
+              height="28"
+              class="rounded"
+            />
+            <a [routerLink]="['/coin', f.id]" class="hover:underline">{{
+              f.name
+            }}</a>
           </div>
-          <div class="text-sm">{{f.current_price | number:'1.2-2'}}</div>
+          <div class="text-sm">
+            ${{ f.current_price | number : '1.2-2' }}
+          </div>
         </li>
       </ul>
     </div>

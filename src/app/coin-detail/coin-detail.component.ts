@@ -1,18 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Location } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Chart, registerables } from 'chart.js';
+import { firstValueFrom } from 'rxjs';
+
 import { ApiService } from '../services/api.service';
 import { CacheService } from '../services/cache.service';
 import { FavoritesService } from '../services/favorites.service';
-import {Chart} from 'chart.js';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-coin-detail',
   standalone: true,
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './coin-detail.component.html',
-  styleUrl: './coin-detail.component.css'
+  styleUrls: ['./coin-detail.component.css']
 })
 export class CoinDetailComponent implements OnInit {
   coin: any | null = null;
@@ -20,7 +25,13 @@ export class CoinDetailComponent implements OnInit {
   error: string | null = null;
   chart: Chart | null = null;
 
-  constructor(private route: ActivatedRoute, private api: ApiService, private cache: CacheService, public favSvc: FavoritesService) { }
+  constructor(
+    private route: ActivatedRoute,
+    private api: ApiService,
+    private cache: CacheService,
+    public favSvc: FavoritesService,
+    private location: Location
+  ) {}
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id')!;
@@ -30,25 +41,34 @@ export class CoinDetailComponent implements OnInit {
   async fetch(id: string) {
     this.loading = true;
     this.error = null;
+
     try {
+      // ---- Coin Detail ----
       const detailKey = `coin:${id}`;
       let detail = this.cache.get(detailKey, 60_000);
       if (!detail) {
-        detail = await this.api.getCoinDetail(id).toPromise();
+        detail = await firstValueFrom(this.api.getCoinDetail(id));
         this.cache.set(detailKey, detail);
       }
       this.coin = detail;
 
-      
+      // ---- Chart Data ----
       const chartKey = `chart:${id}:30`;
       let chartData = this.cache.get<any>(chartKey, 60_000);
       if (!chartData) {
-        chartData = await this.api.getCoinMarketChart(id, 'usd', 30).toPromise();
+        chartData = await firstValueFrom(
+          this.api.getCoinMarketChart(id, 'usd', 30)
+        );
         this.cache.set(chartKey, chartData);
       }
-      this.renderChart(chartData.prices || []);
+
+      if (chartData?.prices?.length) {
+        this.renderChart(chartData.prices);
+      } else {
+        this.error = 'No chart data available.';
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Error fetching coin detail:', err);
       this.error = 'Failed to load coin data.';
     } finally {
       this.loading = false;
@@ -56,21 +76,29 @@ export class CoinDetailComponent implements OnInit {
   }
 
   renderChart(prices: any[]) {
-    const ctx = (document.getElementById('priceChart') as HTMLCanvasElement).getContext('2d')!;
+    const canvas = document.getElementById('priceChart') as HTMLCanvasElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
     if (this.chart) this.chart.destroy();
+
     const labels = prices.map((p: any) => {
       const d = new Date(p[0]);
       return `${d.getMonth() + 1}/${d.getDate()}`;
     });
     const data = prices.map((p: any) => p[1]);
+
     this.chart = new Chart(ctx, {
       type: 'line',
       data: {
         labels,
         datasets: [
           {
-            label: `${this.coin.name} price (USD)`,
+            label: `${this.coin?.name || ''} price (USD)`,
             data,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59,130,246,0.1)',
             fill: true,
             tension: 0.2
           }
@@ -88,6 +116,10 @@ export class CoinDetailComponent implements OnInit {
         }
       }
     });
+  }
+
+  goBack() {
+    this.location.back();
   }
 
   toggleFav() {
